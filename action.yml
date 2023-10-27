@@ -1,0 +1,25 @@
+---
+name: 'Compose a GitHub Actions matrix'
+description: "Combine a base matrix with additional parameters"
+inputs:
+  base_matrix_url:
+    description: 'URL to the file containing the base matrix, encoded as JSON'
+    required: true
+  include:
+    description: 'Variable "include" for the matrix, encoded in JSON'
+    required: false
+    default: ''
+  exclude:
+    description: 'Variable "exclude" for the matrix, encoded in JSON'
+    required: false
+    default: ''
+outputs:
+  matrix:
+    description: "GitHub Action matrix configuration"
+    value: ${{ steps.script.outputs.matrix }}
+runs:
+  using: "composite"
+  steps:
+    - id: script
+      run: ${{ github.action_path }}/build_matrix ${{ inputs.base_matrix_url }} --include '${{ inputs.include }}' --exclude '${{ inputs.exclude }}'
+      shell: bash
