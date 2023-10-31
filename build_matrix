@@ -3,13 +3,11 @@
 import argparse
 import json
 import os
-from urllib.request import urlopen
 from pprint import pprint
 
 
-def main(matrix_url, include, exclude):
-    with urlopen(matrix_url) as response:
-        matrix = json.load(response)
+def main(matrix_file, include, exclude):
+    matrix = json.load(matrix_file)
 
     if include:
         matrix['include'] = json.loads(include)
@@ -26,10 +24,10 @@ def main(matrix_url, include, exclude):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('matrix_url')
+    parser.add_argument('matrix', type=argparse.FileType('r', encoding='UTF-8'))
     parser.add_argument('--include', required=False)
     parser.add_argument('--exclude', required=False)
 
     args = parser.parse_args()
 
-    main(args.matrix_url, args.include, args.exclude)
+    main(args.matrix, args.include, args.exclude)

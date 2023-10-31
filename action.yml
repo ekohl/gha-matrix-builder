@@ -2,9 +2,16 @@
 name: 'Compose a GitHub Actions matrix'
 description: "Combine a base matrix with additional parameters"
 inputs:
-  base_matrix_url:
-    description: 'URL to the file containing the base matrix, encoded as JSON'
-    required: true
+  repository:
+    description: 'Repository to clone'
+    required: false
+  ref:
+    description: 'Ref to clone'
+    required: false
+  base_matrix_path:
+    description: 'Path within the repository to the file containing the base matrix, encoded as JSON'
+    required: false
+    default: '.github/matrix.json'
   include:
     description: 'Variable "include" for the matrix, encoded in JSON'
     required: false
@@ -20,6 +27,14 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: 'Clone repo'
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.ref }}
+        sparse-checkout: |
+          ${{ inputs.base_matrix_path }}
+        sparse-checkout-cone-mode: false
     - id: script
-      run: ${{ github.action_path }}/build_matrix ${{ inputs.base_matrix_url }} --include '${{ inputs.include }}' --exclude '${{ inputs.exclude }}'
+      run: ${{ github.action_path }}/build_matrix ${{ inputs.base_matrix_path }} --include '${{ inputs.include }}' --exclude '${{ inputs.exclude }}'
       shell: bash
